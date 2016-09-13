@@ -1,7 +1,7 @@
 package main 
 
 import (
-	//"os"
+	"os"
 	"net/http"
 	"log"
 )
@@ -29,7 +29,11 @@ func handler(w http.ResponseWriter, r *http.Request){
 }
 
 func main(){
-	//port := os.Getenv("PORT")
+	port := os.Getenv("PORT") 
+
+	if port == "" {
+		port = "3000"
+	}
 
 	// Handle all requests to the web root w/ passed in function, handler
 	// http.HandleFunc("/", handler)
@@ -49,7 +53,7 @@ func main(){
 		ServeMux: Compares incoming requests against a list of predefined URL paths, and 
 		calls the associated handler for the path whenever a match is found.
 	*/
-	/*
+	/*	
 		type ServeMux struct {
 		    mu sync.RWMutex   // because of concurrency, we have to use a mutex here
 		    m  map[string]muxEntry  // router rules, every string mapping to a handler
@@ -58,5 +62,5 @@ func main(){
 	// Handle and HandleFunc add handlers to DefaultServeMuxs
 	// Handlers are responsible for writing response headers and bodies.
 	log.Println("Listening...")
-	http.ListenAndServe(":3000", nil)
+	http.ListenAndServe(":" + port, nil)
 }
