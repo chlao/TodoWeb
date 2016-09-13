@@ -3,6 +3,7 @@ package main
 import (
 	//"os"
 	"net/http"
+	"log"
 )
 
 // This function is of type http.HandlerFunc
