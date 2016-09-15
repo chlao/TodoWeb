@@ -1,0 +1,61 @@
+<!doctype html> 
+<html> 
+	<head> 
+		<meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>To Do Application</title>
+        <meta name="description" content="Todo Application">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="css/vendor/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/style.css"> 
+	</head>
+	<body>
+		<div class="todo__container"> 
+			<h1 class="todo__title"> To do </h1> 
+			<h2 class="form__title"> Add a Task <i class="fa fa-angle-down addarrow" aria-hidden="true" style="font-size: 36px;"></i></h2>
+			<!--method="POST" action="/todoitems"-->
+			<form class="todo__form">
+				<fieldset class="inputgroup">
+					<label for="todo__name">Task</label>
+					<input id="todo__name" class="form__textbox" name="todo__name" type="text" placeholder="What needs to be done?" autofocus>
+				</fieldset> 
+
+				<fieldset class="inputgroup">
+					<label for="todo__dueDate">Due </label>
+					<input id="todo__dueDate" class="form__textbox" name="todo__dueDate" type="date">
+				</fieldset> 
+				
+				<fieldset class="todo__priority inputgroup">
+					<legend> Priority </legend>
+					<input id="priority__high" type="radio" name="priority" value="High" checked>
+					<label for="priority__high">High</label>
+					<br>
+					<input id="priority__normal" type="radio" name="priority" value="Normal">
+					<label for="priority__normal">Normal</label>
+					<br>
+					<input id="priority__low" type="radio" name="priority" value="Low">
+					<label for="priority__low">Low</label>
+				</fieldset>
+
+				<fieldset class="inputgroup">
+					<label for="todo__description">Description</label>
+					<textarea id="todo__description" class="form__textbox" name="todo__description" placeholder="Description"></textarea>
+				</fieldset>
+				<input class="todo__submit" type="submit">
+			</form>
+			<p class="error__message"> Please provide a valid entry </p> 
+			<ul class="todo__list"></ul>
+			<div class="todo__info"> 
+				<p class="items__left"></p> 
+				<button class="filter__button filter__all"> All </button> 
+				<button class="filter__button filter__active"> Active </button> 
+				<button class="filter__button filter__completed"> Complete </button> 
+			</div> 
+		</div> 
+
+		<script src="js/vendor/jquery-1.12.0.min.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+</html> 
