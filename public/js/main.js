@@ -5,6 +5,10 @@ Date.prototype.toDateInputValue = (function() {
     return local.toJSON().slice(0,10);
 });
 
+function showItems(){
+	$.aja
+}
+
 function addItem(){
 	var todoName = $('#todo__name').val();
 	var todoPriority = $('input[name=priority]:checked').val();
@@ -34,14 +38,18 @@ function addItem(){
 				priority: todoPriority, 
 				dueDate: todoDueDate, 
 				description: todoDescription }, 
-		error: handleError
+		error: handleError,
+		success: function(data){
+			console.log(data);
+			$('.todo__list .todo__item:last-child').attr('id', "item_" + data.id); 
+		}
 	}); 
 }
 
 function handleError(jqXHR, textStatus, errorThrown){
 	$('error__message').text(textStatus + ' ' + errorThrown).show();
 	// Remove the item added on the client-side 
-	$('.todo__list .toto__item:last-child').remove();
+	$('.todo__list .todo__item:last-child').remove();
 }
 
 function resetFormValues(){

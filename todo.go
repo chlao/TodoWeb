@@ -15,29 +15,10 @@ import (
 			db, err := sql.Open("sqlite3", "./foo.db")
 	*/
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/gorilla/mux"
 	"database/sql"
+	"github.com/gorilla/mux"
+	"encoding/json"
 )
-
-/* A Context carries a deadline, cancelation signal, and request-scoped values
-// across API boundaries. Its methods are safe for simultaneous use by multiple
-// goroutines.
-type Context interface {
-    // Done returns a channel that is closed when this Context is canceled
-    // or times out.
-    Done() <-chan struct{}
-
-    // Err indicates why this context was canceled, after the Done channel
-    // is closed.
-    Err() error
-
-    // Deadline returns the time when this Context will be canceled, if any.
-    Deadline() (deadline time.Time, ok bool)
-
-    // Value returns the value associated with key or nil if none.
-    Value(key interface{}) interface{}
-}
-*.
 
 // This function is of type http.HandlerFunc
 /*
@@ -73,7 +54,7 @@ func NewDB() *sql.DB {
 }
 
 func AddItem(db *sql.DB) http.Handler{
-	 return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	 	err := r.ParseForm()
 		checkErr(err)
 
@@ -97,17 +78,39 @@ func AddItem(db *sql.DB) http.Handler{
         id, err := res.LastInsertId(); 
         checkErr(err)
 
-        fmt.Println(id)
-	 })
+        //io.WriteString()
+
+        // Set content-type header to JSON
+        w.Header().Set("Content-Type", "application/json")
+
+	    response := map[string]int{"id": int(id)}
+	    jsonResponse, err := json.Marshal(response)
+	    checkErr(err)
+	    fmt.Println(string(jsonResponse))
+
+	    //json.NewEncoder(w).Encode(jsonresponse)
+	    w.Write(jsonResponse)
+	})
 }
 
-func ShowItems(db *sql.DB) {
+/*
+func Readtems(db *sql.DB) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		checkErr(err)
+
+
+	})
+}
+
+func DeleteItem(db *sql.DB) http.Handler{
 
 }
 
-func DeleteItem(db *sql.DB){
+func UpdateItem(db *sql.DB) http.Handler{
 
 }
+*/
 
 func checkErr(err error){
 	if err != nil {
@@ -135,10 +138,13 @@ func main(){
 	r := mux.NewRouter()
 
 	// Handle all requests to the web root w/ passed in function, handler
-	r.Handle("/todoitems", AddItem(db))
+	r.Handle("/todoitems", AddItem(db)).Methods("POST")
+	//r.Handle("/todoItems", ReadItems(db)).Methods("GET")
 
 	// This will serve files under http://localhost:3000/<filename> - Serves CSS, JS files 
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./public"))))
+
+	log.Println("Listening...")
 
 	// Used to start the server 
 	// When it receives an HTTP request, it will hand it off to the http.Handler that we supply as the second argument
@@ -160,8 +166,5 @@ func main(){
 	*/
 	// Handle and HandleFunc add handlers to DefaultServeMuxs
 	// Handlers are responsible for writing response headers and bodies.
-
-	log.Println("Listening...")
-
 	http.ListenAndServe(":" + port, r)
 }
