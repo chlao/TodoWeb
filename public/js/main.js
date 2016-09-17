@@ -15,18 +15,27 @@ function readItems(){
 		}, 
 		success: function(data){
 			console.log(data);
+
+			if (data.length > 0){
+				$('.todo__info').show();
+			}
 			// Add database items to list  
 			for (var i = 0; i < data.length; i++){
-				$('.todo__list').append('<li class="todo__item" id="item_' + data[i].id + '"><i class="fa fa-circle ' + 'priority' + data[i].priority + '" aria-hidden="true"></i>' + data[i].name + 
-							'<span class="todo__options"><i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
-							'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i></span></li>');
+				$('.todo__list').append('<li class="todo__item" id="item_' + data[i].id + '">' + 
+											'<i class="fa fa-circle ' + 'priority' + data[i].priority + '" aria-hidden="true"></i>' + 
+											'<p class="item__name">' + data[i].name + '</p>' + 
+											'<div class="todo__options">' + 
+												'<i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
+												'<i class="fa fa-pencil todo__edit" aria-hidden="true"></i>' + 
+												'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i></div></li>');
 
 				if (data[i].duedate !== ''){
-					$('<p>').text('Due: ' + data[i].dueDate).addClass('item__dueDate').appendTo('.todo__item:last-child');
+					$('.todo__item:last-child').append('<p class="item__dueDate"><span class="item__title">Due: </span>' + data[i].dueDate + '</p>'); 
 				}
 
 				if (data[i].description !== ''){
-					$('<p>').text('Description: ' + data[i].description).addClass('item__description').appendTo('.todo__item:last-child').hide();
+					$('.todo__item:last-child').append('<p class="item__description"><span class="item__title">Description: </span>' + data[i].description + '</p>'); 
+					$('.todo__item:last-child .item__description').hide();
 				}
 
 				if (data[i].completed == 1){
@@ -43,9 +52,13 @@ function addItem(){
 	var todoDueDate = $('#todo__dueDate').val();
 	var todoDescription = $('#todo__description').val();
 
-	$('.todo__list').append('<li class="todo__item"><i class="fa fa-circle ' + 'priority' + todoPriority + '" aria-hidden="true"></i>' + todoName + 
-							'<span class="todo__options"><i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
-							'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i></span></li>');
+	$('.todo__list').append('<li class="todo__item">' + 
+								'<i class="fa fa-circle ' + 'priority' + todoPriority + '" aria-hidden="true"></i>' + 
+								'<p class="item__name">' + todoName + '</p>' + 
+								'<div class="todo__options">' + 
+									'<i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
+									'<i class="fa fa-pencil todo__edit" aria-hidden="true"></i>' + 
+									'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i></div></li>');
 
 	if (todoDueDate !== ''){
 		var year = parseInt(todoDueDate.slice(0, 4)); 
@@ -54,16 +67,13 @@ function addItem(){
 
 		todoDueDate = month + '/' + day +'/' + year;
 
-		$('<p>').text('Due: ' + todoDueDate).addClass('item__dueDate').appendTo('.todo__item:last-child');
-	} else {
-		todoDueDate = null; 
-	}
+		$('.todo__item:last-child').append('<p class="item__dueDate"><span class="item__title">Due: </span>' + todoDueDate + '</p>'); 
+	} 
 
 	if (todoDescription.trim() !== ''){
-		$('<p>').text('Description: ' + todoDescription).addClass('item__description').appendTo('.todo__item:last-child').hide();
-	} else {
-		todoDescription = null;
-	}
+		$('.todo__item:last-child').append('<p class="item__description"><span class="item__title">Description: </span>' + todoDescription + '</p>'); 
+		$('.todo__item:last-child .item__description').hide();
+	} 
 
 	$.ajax({
 		type: 'POST', 
@@ -182,8 +192,12 @@ function attachItemListeners(){
 			}
 	});
 
+	$('.todo__list').on('click', '.todo__edit', function(){
+		console.log($(this).parents('.todo__item ').text());
+	});
+
 	$('.todo__list').on('click', '.todo__item', function(e){
-		if ($(event.target).hasClass('todo__complete') || $(event.target).hasClass('todo__delete')){
+		if ($(event.target).hasClass('todo__complete') || $(event.target).hasClass('todo__delete') || $(event.target).hasClass('todo__edit')){
 			return;
 		}
 		

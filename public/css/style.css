@@ -56,7 +56,7 @@ label[for^="priority"]{
 }
 
 .todo__item{
-	padding: 10px;
+	padding: 20px;
 	background-color: white;
 	margin-top: 15px;
 	margin-bottom: 5px;
@@ -73,6 +73,10 @@ label[for^="priority"]{
 
 .todo__delete:hover{
 	color: red;
+}
+
+.todo__edit:hover{
+	color: yellow;
 }
 
 .todo__options{
@@ -136,7 +140,7 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 }
 
 .fa-circle[class^="priority"], .fa-circle[class*="priority"]{
-	margin-right: 10px;
+	margin-right: 20px;
 }
 
 .form__title{
@@ -153,4 +157,16 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 
 .item__dueDate, .item__description{
 	margin: 10px 0;
+	margin-left: 44px;
+	font-size: 22px;
+}
+
+.item__name{
+	display: inline; 
+	font-size: 32px;
+}
+
+.item__title{
+	font-weight: bold;
+	display: inline-block;
 }
