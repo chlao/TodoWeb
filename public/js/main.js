@@ -15,10 +15,8 @@ function readItems(){
 			console.log(err); 
 		}, 
 		success: function(data){
-			// Add database items to list 
-			console.log(data); 
-			var i; 
-			for (i = 0; i < data.length; i++){
+			// Add database items to list  
+			for (var i = 0; i < data.length; i++){
 				$('.todo__list').append('<li class="todo__item" id="item_' + data[i].id + '"><i class="fa fa-circle ' + 'priority' + data[i].priority + '" aria-hidden="true"></i>' + data[i].name + 
 							'<span class="todo__options"><i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
 							'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i></span></li>');
@@ -82,10 +80,27 @@ function addItem(){
 	}); 
 }
 
+function deleteItem(item){
+	var item_id = item.attr('id').split('_')[1]; 
+
+	console.log(item_id);
+	$.ajax({
+		type: 'DELETE', 
+		url: '/todoitems/' + item_id,
+		error: function(err){
+			console.log(err);
+		},
+		success: function(){
+			item.remove();
+		}
+	}); 
+}
+
 function updateItem(item){
 
 }
 
+// TEST 
 function handleError(jqXHR, textStatus, errorThrown){
 	$('error__message').text(textStatus + ' - ' + errorThrown).show();
 	// Remove the item added on the client-side 
@@ -139,7 +154,7 @@ function attachFilterListeners(){
 
 function attachItemListeners(){
 	$('.todo__list').on('click', '.todo__delete', function(){
-		$(this).parents('.todo__item').remove();
+		deleteItem($(this).parents('.todo__item'));
 
 		if ($('.todo__list').children().length <= 0){
 			$('.todo__info').hide();
@@ -160,7 +175,7 @@ function attachItemListeners(){
 	});
 
 	$('.todo__list').on('click', '.todo__item', function(e){
-		if ($(event.target).hasClass('todo__complete')){
+		if ($(event.target).hasClass('todo__complete') || $(event.target).hasClass('todo__delete')){
 			return;
 		}
 		

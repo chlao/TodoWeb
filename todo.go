@@ -4,6 +4,7 @@ import (
 	"os"
 	"net/http"
 	"log"
+	"strings"
 	"fmt"
 	//"io"
 	/*  _ It's for importing a package solely for its side-effects.
@@ -141,11 +142,27 @@ func ReadItems(db *sql.DB) http.Handler{
 		json.NewEncoder(w).Encode(data)	
 	})
 }
-/*
-func DeleteItem(db *sql.DB) http.Handler{
 
+func DeleteItem(db *sql.DB) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		checkErr(err)
+
+		split := strings.Split(r.URL.String(), "/")
+		id := split[len(split) - 1]
+
+		stmt, err := db.Prepare("DELETE FROM todoitems WHERE id=?")
+		checkErr(err)
+		
+		res, err := stmt.Exec(id)
+		checkErr(err)
+
+		affected, err := res.RowsAffected()
+		checkErr(err)
+	})
 }
 
+/*
 func UpdateItem(db *sql.DB) http.Handler{
 
 }
@@ -177,8 +194,9 @@ func main(){
 	r := mux.NewRouter()
 
 	// Handle all requests to the web root w/ passed in function, handler
-	r.Handle("/todoitems", AddItem(db)).Methods("POST")
-	r.Handle("/todoitems", ReadItems(db)).Methods("GET")
+	r.Handle("/todoitems", AddItem(db)).Methods(http.MethodPost)
+	r.Handle("/todoitems", ReadItems(db)).Methods(http.MethodGet)
+	r.Handle("/todoitems/{id}", DeleteItem(db)).Methods(http.MethodDelete)
 
 	// This will serve files under http://localhost:3000/<filename> - Serves CSS, JS files 
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./public"))))
