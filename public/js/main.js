@@ -11,10 +11,10 @@ function readItems(){
 		url: '/todoitems',
 		datatype: 'json',
 		error: function(err){
-			console.log('ERROR');
 			console.log(err); 
 		}, 
 		success: function(data){
+			console.log(data);
 			// Add database items to list  
 			for (var i = 0; i < data.length; i++){
 				$('.todo__list').append('<li class="todo__item" id="item_' + data[i].id + '"><i class="fa fa-circle ' + 'priority' + data[i].priority + '" aria-hidden="true"></i>' + data[i].name + 
@@ -29,7 +29,7 @@ function readItems(){
 					$('<p>').text('Description: ' + data[i].description).addClass('item__description').appendTo('.todo__item:last-child').hide();
 				}
 
-				if (data[i].completed === 1){
+				if (data[i].completed == 1){
 					$('.todo__list .todo__item:last-child').addClass('completed'); 
 				}
 			}
@@ -83,7 +83,6 @@ function addItem(){
 function deleteItem(item){
 	var item_id = item.attr('id').split('_')[1]; 
 
-	console.log(item_id);
 	$.ajax({
 		type: 'DELETE', 
 		url: '/todoitems/' + item_id,
@@ -97,7 +96,16 @@ function deleteItem(item){
 }
 
 function updateItem(item){
+	var item_id = item.attr('id').split('_')[1]; 
 
+	$.ajax({
+		type: 'PUT', 
+		url: '/todoitems/' + item_id,
+		data: {completed: 1}, 
+		error: function(err){
+			console.log(err);
+		}
+	}); 
 }
 
 // TEST 

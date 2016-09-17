@@ -21,6 +21,7 @@ import (
 	"github.com/gorilla/mux"
 	"encoding/json"
 	"github.com/elgs/gosqljson"
+	//"bytes"
 )
 
 // This function is of type http.HandlerFunc
@@ -154,19 +155,44 @@ func DeleteItem(db *sql.DB) http.Handler{
 		stmt, err := db.Prepare("DELETE FROM todoitems WHERE id=?")
 		checkErr(err)
 		
-		res, err := stmt.Exec(id)
-		checkErr(err)
-
-		affected, err := res.RowsAffected()
+		_, err = stmt.Exec(id)
 		checkErr(err)
 	})
 }
 
-/*
 func UpdateItem(db *sql.DB) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		checkErr(err)
 
+		split := strings.Split(r.URL.String(), "/")
+		id := split[len(split) - 1]
+
+		/*
+		var buffer bytes.Buffer
+
+		for key, val := range r.Form {
+			buffer.WriteString(key)
+			buffer.WriteString(" = ")
+			buffer.WriteString(val)
+			buffer.WriteString(", ")
+		}
+
+		buffer.TrimSuffix(buffer, ", ")
+		*/
+
+		stmt, err := db.Prepare("UPDATE todoitems SET completed = ? WHERE id = ?")
+		checkErr(err)
+
+		res, err := stmt.Exec(r.FormValue("completed"), id)
+		checkErr(err)
+
+		affected, err := res.RowsAffected()
+
+		fmt.Println(affected)
+		fmt.Println(id)
+	})
 }
-*/
 
 func checkErr(err error){
 	if err != nil {
@@ -197,6 +223,11 @@ func main(){
 	r.Handle("/todoitems", AddItem(db)).Methods(http.MethodPost)
 	r.Handle("/todoitems", ReadItems(db)).Methods(http.MethodGet)
 	r.Handle("/todoitems/{id}", DeleteItem(db)).Methods(http.MethodDelete)
+	/* 
+		PUT is used when you know the url of the item being created
+		Decide to use PUT or POST based on idempotence (Putting an object 2x has no effect)
+	*/
+	r.Handle("/todoitems/{id}", UpdateItem(db)).Methods(http.MethodPut)
 
 	// This will serve files under http://localhost:3000/<filename> - Serves CSS, JS files 
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./public"))))
