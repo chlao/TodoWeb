@@ -5,8 +5,38 @@ Date.prototype.toDateInputValue = (function() {
     return local.toJSON().slice(0,10);
 });
 
-function showItems(){
-	$.aja
+function readItems(){
+	$.ajax({
+		type: 'GET', 
+		url: '/todoitems',
+		datatype: 'json',
+		error: function(err){
+			console.log('ERROR');
+			console.log(err); 
+		}, 
+		success: function(data){
+			// Add database items to list 
+			console.log(data); 
+			var i; 
+			for (i = 0; i < data.length; i++){
+				$('.todo__list').append('<li class="todo__item" id="item_' + data[i].id + '"><i class="fa fa-circle ' + 'priority' + data[i].priority + '" aria-hidden="true"></i>' + data[i].name + 
+							'<span class="todo__options"><i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
+							'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i></span></li>');
+
+				if (data[i].duedate !== ''){
+					$('<p>').text('Due: ' + data[i].dueDate).addClass('item__dueDate').appendTo('.todo__item:last-child');
+				}
+
+				if (data[i].dueDate !== ''){
+					$('<p>').text('Description: ' + data[i].description).addClass('item__description').appendTo('.todo__item:last-child').hide();
+				}
+				/*
+				if (data[i].complete){
+
+				}*/
+			}
+		}
+	}); 
 }
 
 function addItem(){
@@ -19,16 +49,20 @@ function addItem(){
 							'<span class="todo__options"><i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
 							'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i></span></li>');
 
-	if (todoDueDate != ''){
+	if (todoDueDate !== ''){
 		var year = parseInt(todoDueDate.slice(0, 4)); 
 		var month = parseInt(todoDueDate.slice(5, 7));
 		var day = parseInt(todoDueDate.slice(8));
 
 		$('<p>').text('Due: ' + month + '/' + day +'/' + year).addClass('item__dueDate').appendTo('.todo__item:last-child');
+	} else {
+		todoDueDate = null; 
 	}
 
-	if (todoDescription.trim() != ''){
+	if (todoDescription.trim() !== ''){
 		$('<p>').text('Description: ' + todoDescription).addClass('item__description').appendTo('.todo__item:last-child').hide();
+	} else {
+		todoDescription = null;
 	}
 
 	$.ajax({
@@ -40,14 +74,13 @@ function addItem(){
 				description: todoDescription }, 
 		error: handleError,
 		success: function(data){
-			console.log(data);
 			$('.todo__list .todo__item:last-child').attr('id', "item_" + data.id); 
 		}
 	}); 
 }
 
 function handleError(jqXHR, textStatus, errorThrown){
-	$('error__message').text(textStatus + ' ' + errorThrown).show();
+	$('error__message').text(textStatus + ' - ' + errorThrown).show();
 	// Remove the item added on the client-side 
 	$('.todo__list .todo__item:last-child').remove();
 }
@@ -65,6 +98,8 @@ $(document).ready(function(){
 	attachFormListeners();
 	attachFilterListeners();
 	attachItemListeners();
+
+	readItems();
 });
 
 function attachFilterListeners(){

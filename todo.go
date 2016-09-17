@@ -4,7 +4,8 @@ import (
 	"os"
 	"net/http"
 	"log"
-	"fmt"
+	//"fmt"
+	//"io"
 	/*  _ It's for importing a package solely for its side-effects.
 		In the case of go-sqlite3, the underscore import is used for the side-effect of registering 
 	    the sqlite3 driver as a database driver in the init() function, without importing any other functions 
@@ -18,6 +19,7 @@ import (
 	"database/sql"
 	"github.com/gorilla/mux"
 	"encoding/json"
+	"github.com/elgs/gosqljson"
 )
 
 // This function is of type http.HandlerFunc
@@ -47,7 +49,10 @@ func NewDB() *sql.DB {
     db, err := sql.Open("sqlite3", "./todo.db")
     checkErr(err)
     
-    _, err = db.Exec("CREATE TABLE IF NOT EXISTS todoitems(title text, dueDate text, priority text, description text)")
+    _, err = db.Exec("DROP TABLE todoitems")
+    checkErr(err)
+
+    _, err = db.Exec("CREATE TABLE IF NOT EXISTS todoitems(id integer primary key autoincrement, name text, dueDate text, priority text, description text)")
     checkErr(err)
 
     return db
@@ -58,13 +63,13 @@ func AddItem(db *sql.DB) http.Handler{
 	 	err := r.ParseForm()
 		checkErr(err)
 
-		todoName := r.PostFormValue("todo__name")
-		todoDueDate := r.PostFormValue("todo__dueDate")
-		todoPriority := r.PostFormValue("todo__priority")
-		todoDescription := r.PostFormValue("todo__description")
+		todoName := r.PostFormValue("name")
+		todoDueDate := r.PostFormValue("dueDate")
+		todoPriority := r.PostFormValue("priority")
+		todoDescription := r.PostFormValue("description")
 
 	 	// Insert 
-		stmt, err := db.Prepare("INSERT INTO todoitems (title, dueDate, priority, description) VALUES(?, ?, ?, ?)")
+		stmt, err := db.Prepare("INSERT INTO todoitems (name, dueDate, priority, description) VALUES(?, ?, ?, ?)")
 		checkErr(err)
 		
 		res, err := stmt.Exec(todoName, todoDueDate, todoPriority, todoDescription)
@@ -86,23 +91,52 @@ func AddItem(db *sql.DB) http.Handler{
 	    response := map[string]int{"id": int(id)}
 	    jsonResponse, err := json.Marshal(response)
 	    checkErr(err)
-	    fmt.Println(string(jsonResponse))
 
 	    //json.NewEncoder(w).Encode(jsonresponse)
 	    w.Write(jsonResponse)
 	})
 }
 
-/*
-func Readtems(db *sql.DB) http.Handler{
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		checkErr(err)
-
-
-	})
+type TodoItem struct {
+	id 				int
+	name 			string
+	dueDate 		string
+	priority 		string
+	description 	string 
 }
 
+func ReadItems(db *sql.DB) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		/*
+		rows, err := db.Query("SELECT * FROM todoitems")
+		checkErr(err)
+		*/
+		/*
+			A defer statement pushes a function call onto a list. 
+			The list of saved calls is executed after the surrounding function returns. 
+			Defer is commonly used to simplify functions that perform various clean-up actions.
+		*/
+		//defer rows.Close()
+
+		/*
+		var result []TodoItem
+		for rows.Next() {
+			item := TodoItem{}
+			err := rows.Scan(&item.id, &item.name, &item.dueDate, &item.priority, &item.description)
+			checkErr(err)
+			result = append(result, item)
+			json.NewEncoder(w).Encode(item)
+		}
+		*/
+		w.Header().Set("Content-Type", "application/json")	
+
+		data, err := gosqljson.QueryDbToMap(db, "", "SELECT * FROM todoitems")
+		checkErr(err)
+
+		json.NewEncoder(w).Encode(data)	
+	})
+}
+/*
 func DeleteItem(db *sql.DB) http.Handler{
 
 }
@@ -139,7 +173,7 @@ func main(){
 
 	// Handle all requests to the web root w/ passed in function, handler
 	r.Handle("/todoitems", AddItem(db)).Methods("POST")
-	//r.Handle("/todoItems", ReadItems(db)).Methods("GET")
+	r.Handle("/todoitems", ReadItems(db)).Methods("GET")
 
 	// This will serve files under http://localhost:3000/<filename> - Serves CSS, JS files 
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./public"))))
