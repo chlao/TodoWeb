@@ -27,13 +27,13 @@ function readItems(){
 					$('<p>').text('Due: ' + data[i].dueDate).addClass('item__dueDate').appendTo('.todo__item:last-child');
 				}
 
-				if (data[i].dueDate !== ''){
+				if (data[i].description !== ''){
 					$('<p>').text('Description: ' + data[i].description).addClass('item__description').appendTo('.todo__item:last-child').hide();
 				}
-				/*
-				if (data[i].complete){
 
-				}*/
+				if (data[i].completed === 1){
+					$('.todo__list .todo__item:last-child').addClass('completed'); 
+				}
 			}
 		}
 	}); 
@@ -54,7 +54,9 @@ function addItem(){
 		var month = parseInt(todoDueDate.slice(5, 7));
 		var day = parseInt(todoDueDate.slice(8));
 
-		$('<p>').text('Due: ' + month + '/' + day +'/' + year).addClass('item__dueDate').appendTo('.todo__item:last-child');
+		todoDueDate = month + '/' + day +'/' + year;
+
+		$('<p>').text('Due: ' + todoDueDate).addClass('item__dueDate').appendTo('.todo__item:last-child');
 	} else {
 		todoDueDate = null; 
 	}
@@ -71,12 +73,17 @@ function addItem(){
 		data: { name: todoName, 
 				priority: todoPriority, 
 				dueDate: todoDueDate, 
-				description: todoDescription }, 
+				description: todoDescription, 
+				completed: 0 }, 
 		error: handleError,
 		success: function(data){
 			$('.todo__list .todo__item:last-child').attr('id', "item_" + data.id); 
 		}
 	}); 
+}
+
+function updateItem(item){
+
 }
 
 function handleError(jqXHR, textStatus, errorThrown){
@@ -142,6 +149,10 @@ function attachItemListeners(){
 
 	$('.todo__list').on('click', '.todo__complete', function(){
 		$(this).parents('.todo__item').toggleClass('completed');
+
+		if ($(this).parents('.todo__item').hasClass('completed')){
+			updateItem($(this).parents('.todo__item'));
+		}
 
 		if ($('.filter__active').hasClass('selected__filter')){
 				$(this).parents('.todo__item').hide();
