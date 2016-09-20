@@ -51,11 +51,11 @@ function readItems(){
 												'</div></li>');
 
 				if (data[i].duedate !== ''){
-					$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span>' + data[i].dueDate + '</p>'); 
+					$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content">' + data[i].dueDate + '</span></p>'); 
 				}
 
 				if (data[i].description !== ''){
-					$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span>' + data[i].description + '</p>'); 
+					$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content">' + data[i].description + '</span></p>'); 
 					$('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>').insertAfter('.todo__item:last-child .item__name'); 
 					$('.todo__item:last-child .item__description').hide();
 				}
@@ -89,11 +89,11 @@ function addItem(){
 
 
 	if (todoDueDate !== ''){
-		$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span>' + todoDueDate + '</p>'); 
+		$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content">' + todoDueDate + '</span></p>'); 
 	} 
 
 	if (todoDescription.trim() !== ''){
-		$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span>' + todoDescription + '</p>'); 
+		$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content">' + todoDescription + '</span></p>'); 
 		$('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>').insertAfter('.todo__item:last-child .item__name'); 
 		$('.todo__item:last-child .item__description').hide();
 	} 
@@ -131,7 +131,7 @@ function deleteItem(item){
 function updateItem(item){
 	var item_id = item.attr('id').split('_')[1]; 
 
-	var newItemName = $('.item__name--edit').val();
+	var newItemName = $('.item__name--edit').text();
 	var newItemDueDate = convertFromDateToString($('.item__dueDate--edit').val()); 
 	var newItemDescription = $('.item__description--edit').val();
 	var newItemPriority = $('input[name=priority--edit]:checked').val();
@@ -149,7 +149,25 @@ function updateItem(item){
 			console.log(err);
 		},
 		success: function(){
-			nonEditItemState();
+			console.log('success'); 	
+			$('.editing .item__name').text(newItemName); 
+			$('.editing .item__dueDate .item__content').text(newItemDueDate); 
+			$('.editing .item__description .item__content').text(newItemDescription);
+
+			$('.editing .item__name--edit').remove();
+			$('.editing .item__dueDate--edit').remove();
+			$('.editing .item__description--edit').remove();
+
+			var prevPriority = getPriority($('.editing .fa-circle[class*="priority"]')); 
+			if (newItemPriority != prevPriority){
+				$('.editing .fa-circle[class*="priority"]').addClass('priority--' + newItemPriority); 
+				$('.editing .fa-circle[class*="priority"]').removeClass('priority--' + prevPriority); 
+			}
+
+			$('.item__priority--edit').remove();
+			$('.todo__submit--edit').remove();
+
+			$('.editing').removeClass('editing'); 
 		}
 	}); 
 }
@@ -169,15 +187,10 @@ function editItemState(item){
 
 	itemPriorityVal = getPriority(itemPriority).toLowerCase(); 
 
-	console.log(itemDescription);
+	$('<p class="item__name--edit" contenteditable="true">' + itemName + '</p>').insertAfter(itemName); 
+	$('.item__name--edit').text(itemNameVal);
+	placeCaretAtEnd($('.item__name--edit').get(0));
 
-	$(itemName).prop('contenteditable', 'true'); 
-	placeCaretAtEnd(itemName.get(0));
-	/*
-	$(itemName).replaceWith('<input class="form__textbox form__textbox--edit item__name--edit" type="text">');
-	$('.item__name--edit').val(itemNameVal); 
-	*/
-	//$(itemDueDate).replaceWith('<input class="form__textbox form__textbox--edit item__dueDate--edit" type="date">'); 
 	$('<input class="form__textbox form__textbox--edit item__dueDate--edit" type="date">').insertAfter(itemDueDate); 
 	$('.item__dueDate--edit').val(itemDueDateVal); 
 
@@ -197,7 +210,6 @@ function editItemState(item){
 		item.find('.item__details').append('<textarea class="form__textbox form__textbox--edit item__description--edit" placeholder="Description"></textarea>');
 	} else {
 		$('<textarea class="form__textbox form__textbox--edit item__description--edit"></textarea>').insertAfter(itemDescription); 
-		//$(itemDescription).replaceWith('<textarea class="form__textbox form__textbox--edit item__description--edit"></textarea>');
 		$('.item__description--edit').val(itemDescriptionVal);
 	}
 
@@ -210,21 +222,11 @@ function editItemState(item){
 }
 
 function nonEditItemState(){
-	var newItemName = $('.item__name--edit').val();
-	var newItemDueDate = convertFromDateToString($('.item__dueDate--edit').val()); 
-	var newItemDescription = $('.item__description--edit').val();
-	var newItemPriority = $('input[name=priority--edit]:checked').val();
+	$('.editing .item__content').show();
 
-	$('.editing .item__name--edit').replaceWith('<p class="item__name">' + newItemName + '</p>');
-	$('.editing .item__dueDate--edit').replaceWith('<p class="item__dueDate"><span class="item__title">Due:</span>' + newItemDueDate + '</p>'); 
-	$('.editing .item__description--edit').replaceWith('<p class="item__description"><span class="item__title">Description:</span>' + newItemDescription + '</p>');
-	$('.editing .item__description').hide();
-
-	var prevPriority = getPriority($('.editing .fa-circle[class*="priority"]')); 
-	if (newItemPriority != prevPriority){
-		$('.editing .fa-circle[class*="priority"]').addClass('priority--' + newItemPriority); 
-		$('.editing .fa-circle[class*="priority"]').removeClass('priority--' + prevPriority); 
-	}
+	$('.editing .item__name--edit').remove();
+	$('.editing .item__dueDate--edit').remove();
+	$('.editing .item__description--edit').remove();
 
 	$('.item__priority--edit').remove();
 	$('.todo__submit--edit').remove();
@@ -345,6 +347,8 @@ function attachItemListeners(){
 	$('.todo__list').on('click', '.todo__edit', function(){
 		var item = $(this).parents('.todo__item'); 
 
+		item.find('.todo__description .item__content').hide();
+
 		// If an item is already being edited 
 		if ($('.editing').length > 0){
 			var prevItem = $('.editing'); 
@@ -363,7 +367,10 @@ function attachItemListeners(){
 			return;
 		}
 		
-		$(this).find('.item__description').slideToggle();
+		if (!$(this).hasClass('editing')){
+			$(this).find('.item__description').slideToggle();
+		}
+			
 	});
 }
 

@@ -208,7 +208,7 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	font-size: 22px;
 }
 
-.item__name{
+.item__name, .item__name--edit{
 	font-size: 32px;
 	overflow: hidden;
 	margin: 0;
@@ -223,6 +223,6 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	display: inline-block;
 }
 
-.editing .item__dueDate, .editing .item__description{
+.editing .item__dueDate, .editing .item__description, .editing .item__name{
 	display: none;
 }

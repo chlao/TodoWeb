@@ -190,7 +190,7 @@ func UpdateItem(db *sql.DB) http.Handler{
 		stmt, err := db.Prepare("UPDATE todoitems SET name=?, dueDate=?, priority=?, description=?, completed=? WHERE id=?")
 		checkErr(err)
 
-		res, err := stmt.Exec(todoName, todoDueDate, todoPriority, todoDescription, todoCompleted, id)
+		_, err = stmt.Exec(todoName, todoDueDate, todoPriority, todoDescription, todoCompleted, id)
 		checkErr(err)
 	})
 }
