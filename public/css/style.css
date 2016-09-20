@@ -95,6 +95,7 @@ label[for^="priority"]{
 	margin-top: 15px;
 	margin-bottom: 5px;
 	text-align: left;
+	position: relative;
 }
 
 .completed{
@@ -156,6 +157,28 @@ button:focus, input:focus, select:focus, textarea:focus {outline:0;}
 
 label:not([for^="priority"]), legend{ text-align: right; display: inline-block; width: 200px; float:left; margin-right: 25px;}
 
+/*
+[type="radio"] {
+  border: 0; 
+  clip: rect(0 0 0 0); 
+  height: 1px; margin: -1px; 
+  overflow: hidden; 
+  padding: 0; 
+  position: absolute; 
+  width: 1px;
+}
+
+.priority__radio{
+	margin-right: 10px;
+}
+*/
+
+.expandItem{
+	position: absolute;
+	bottom: 20px; 
+	right: 20px; 
+}
+
 .inputgroup{
 	margin-bottom: 15px;
 	border: 0;
@@ -174,7 +197,7 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	color: green;
 }
 
-.fa-circle[class^="priority"], .fa-circle[class*="priority"]{
+.todo__item .fa-circle[class*="priority"]{
 	margin-top: 10px;
 	margin-right: 20px;
 	float: left;
@@ -198,4 +221,8 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 .item__title{
 	font-weight: bold;
 	display: inline-block;
+}
+
+.editing .item__dueDate, .editing .item__description{
+	display: none;
 }

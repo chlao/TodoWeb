@@ -181,16 +181,17 @@ func UpdateItem(db *sql.DB) http.Handler{
 		buffer.TrimSuffix(buffer, ", ")
 		*/
 
-		stmt, err := db.Prepare("UPDATE todoitems SET completed = ? WHERE id = ?")
+		todoName := r.FormValue("name")
+		todoDueDate := r.FormValue("dueDate")
+		todoPriority := r.FormValue("priority")
+		todoDescription := r.FormValue("description")
+		todoCompleted := r.FormValue("completed")
+
+		stmt, err := db.Prepare("UPDATE todoitems SET name=?, dueDate=?, priority=?, description=?, completed=? WHERE id=?")
 		checkErr(err)
 
-		res, err := stmt.Exec(r.FormValue("completed"), id)
+		res, err := stmt.Exec(todoName, todoDueDate, todoPriority, todoDescription, todoCompleted, id)
 		checkErr(err)
-
-		affected, err := res.RowsAffected()
-
-		fmt.Println(affected)
-		fmt.Println(id)
 	})
 }
 
