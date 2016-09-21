@@ -4,7 +4,6 @@ import (
 	"os"
 	"net/http"
 	"log"
-	"strings"
 	"fmt"
 	//"io"
 	/*  _ It's for importing a package solely for its side-effects.
@@ -21,7 +20,8 @@ import (
 	"github.com/gorilla/mux"
 	"encoding/json"
 	"github.com/elgs/gosqljson"
-	//"bytes"
+	"bytes"
+	"strings"
 )
 
 // This function is of type http.HandlerFunc
@@ -168,30 +168,39 @@ func UpdateItem(db *sql.DB) http.Handler{
 		split := strings.Split(r.URL.String(), "/")
 		id := split[len(split) - 1]
 
-		/*
 		var buffer bytes.Buffer
 
 		for key, val := range r.Form {
 			buffer.WriteString(key)
 			buffer.WriteString(" = ")
-			buffer.WriteString(val)
+			buffer.WriteString("'" + strings.Join(val, "") + "'")
 			buffer.WriteString(", ")
+			fmt.Println(key)
+			fmt.Println(val)
 		}
 
-		buffer.TrimSuffix(buffer, ", ")
-		*/
+		//fmt.Println(buffer.Len())
 
+		buffer.Truncate(buffer.Len() - 2)
+		
+		//fmt.Println(buffer)
+		/*
 		todoName := r.FormValue("name")
 		todoDueDate := r.FormValue("dueDate")
 		todoPriority := r.FormValue("priority")
 		todoDescription := r.FormValue("description")
 		todoCompleted := r.FormValue("completed")
-
-		stmt, err := db.Prepare("UPDATE todoitems SET name=?, dueDate=?, priority=?, description=?, completed=? WHERE id=?")
+		*/
+		stmt, err := db.Prepare("UPDATE todoitems SET " + buffer.String() + " WHERE id=?")
 		checkErr(err)
 
-		_, err = stmt.Exec(todoName, todoDueDate, todoPriority, todoDescription, todoCompleted, id)
+		res, err := stmt.Exec(id)
 		checkErr(err)
+
+		affected, err := res.RowsAffected()
+		checkErr(err)
+		fmt.Println(affected)
+		
 	})
 }
 

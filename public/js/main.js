@@ -50,12 +50,12 @@ function readItems(){
 											'<div class="item__details">' + 
 												'</div></li>');
 
-				if (data[i].duedate !== ''){
-					$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content">' + data[i].dueDate + '</span></p>'); 
+				if (data[i].duedate != null){
+					$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + data[i].dueDate + '</span></p>'); 
 				}
 
 				if (data[i].description !== ''){
-					$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content">' + data[i].description + '</span></p>'); 
+					$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + data[i].description + '</span></p>'); 
 					$('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>').insertAfter('.todo__item:last-child .item__name'); 
 					$('.todo__item:last-child .item__description').hide();
 				}
@@ -88,12 +88,12 @@ function addItem(){
 									'</div></li>');
 
 
-	if (todoDueDate !== ''){
-		$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content">' + todoDueDate + '</span></p>'); 
+	if (todoDueDate != null){
+		$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + todoDueDate + '</span></p>'); 
 	} 
 
 	if (todoDescription.trim() !== ''){
-		$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content">' + todoDescription + '</span></p>'); 
+		$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + todoDescription + '</span></p>'); 
 		$('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>').insertAfter('.todo__item:last-child .item__name'); 
 		$('.todo__item:last-child .item__description').hide();
 	} 
@@ -135,7 +135,8 @@ function updateItem(item){
 	var newItemDueDate = convertFromDateToString($('.item__dueDate--edit').val()); 
 	var newItemDescription = $('.item__description--edit').val();
 	var newItemPriority = $('input[name=priority--edit]:checked').val();
-	var completed = item.hasClass('completed') ? 1 : 0; 
+
+	console.log(newItemDueDate);
 
 	$.ajax({
 		type: 'PUT', 
@@ -143,15 +144,20 @@ function updateItem(item){
 		data: { name: newItemName, 
 				priority: newItemPriority, 
 				dueDate: newItemDueDate,
-				description: newItemDescription, 
-				completed: completed }, 
+				description: newItemDescription }, 
 		error: function(err){
 			console.log(err);
 		},
 		success: function(){
 			console.log('success'); 	
 			$('.editing .item__name').text(newItemName); 
-			$('.editing .item__dueDate .item__content').text(newItemDueDate); 
+
+			if (newItemDueDate == null){
+				$('.editing .item__dueDate').remove();
+			} else {
+				$('.editing .item__dueDate .item__content').text(newItemDueDate); 
+			}
+		
 			$('.editing .item__description .item__content').text(newItemDescription);
 
 			$('.editing .item__name--edit').remove();
@@ -172,6 +178,24 @@ function updateItem(item){
 	}); 
 }
 
+function updateItemCompleted(item){
+	var item_id = item.attr('id').split('_')[1]; 
+	var completed = !item.hasClass('completed') ? 1 : 0; 
+
+	$.ajax({
+		type: 'PUT', 
+		url: '/todoitems/' + item_id,
+		data: { completed: completed}, 
+		error: function(err){
+			console.log(err);
+		},
+		success: function(){
+			item.toggleClass('completed');
+			console.log('completed');
+		}
+	}); 
+}
+
 function editItemState(item){
 	var itemName =item.find('.item__name'); 
 	var itemDueDate = item.find('.item__dueDate'); 
@@ -182,6 +206,8 @@ function editItemState(item){
 
 	var itemDueDateVal = itemDueDate.text().split(':')[1]; 
 	itemDueDateVal = convertFromStringToDate(itemDueDateVal); 
+
+	console.log(itemDueDateVal);
 
 	var itemDescriptionVal = itemDescription.text().split(':').slice(1);
 
@@ -303,13 +329,17 @@ function convertFromDateToString(todoDueDate){
 	var month = parseInt(todoDueDate.slice(5, 7));
 	var day = parseInt(todoDueDate.slice(8));
 
+	if (year !== year && month !== month && day !== day){
+		return null; 
+	}
+
 	return month + '/' + day +'/' + year;
 }
 
 // Converts from MM/DD/YYYY to YYYY-MM-DD
 function convertFromStringToDate(itemDueDate){
-	console.log(itemDueDate);
-	itemDueDateVal = itemDueDate.split('/');
+	itemDueDateVal = itemDueDate.trim().split('/');
+	console.log(itemDueDateVal);
 
 	if (itemDueDateVal[0].length < 2){
 			itemDueDateVal[0] = '0' + itemDueDateVal[0]; 
@@ -333,11 +363,7 @@ function attachItemListeners(){
 	});
 
 	$('.todo__list').on('click', '.todo__complete', function(){
-		$(this).parents('.todo__item').toggleClass('completed');
-
-		if ($(this).parents('.todo__item').hasClass('completed')){
-			updateItem($(this).parents('.todo__item'));
-		}
+		updateItemCompleted($(this).parents('.todo__item'));
 
 		if ($('.filter__active').hasClass('selected__filter')){
 			$(this).parents('.todo__item').hide();
@@ -347,7 +373,7 @@ function attachItemListeners(){
 	$('.todo__list').on('click', '.todo__edit', function(){
 		var item = $(this).parents('.todo__item'); 
 
-		item.find('.todo__description .item__content').hide();
+		item.find('.item__description').hide();
 
 		// If an item is already being edited 
 		if ($('.editing').length > 0){
