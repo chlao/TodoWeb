@@ -50,7 +50,7 @@ function readItems(){
 											'<div class="item__details">' + 
 												'</div></li>');
 
-				if (data[i].duedate != null){
+				if (data[i].dueDate !== ''){
 					$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + data[i].dueDate + '</span></p>'); 
 				}
 
@@ -136,8 +136,6 @@ function updateItem(item){
 	var newItemDescription = $('.item__description--edit').val();
 	var newItemPriority = $('input[name=priority--edit]:checked').val();
 
-	console.log(newItemDueDate);
-
 	$.ajax({
 		type: 'PUT', 
 		url: '/todoitems/' + item_id,
@@ -148,18 +146,29 @@ function updateItem(item){
 		error: function(err){
 			console.log(err);
 		},
-		success: function(){
-			console.log('success'); 	
+		success: function(){	
 			$('.editing .item__name').text(newItemName); 
 
 			if (newItemDueDate == null){
 				$('.editing .item__dueDate').remove();
 			} else {
-				$('.editing .item__dueDate .item__content').text(newItemDueDate); 
+				if ($('.editing .item__dueDate').length){
+					$('.editing .item__dueDate .item__content').text(newItemDueDate); 
+				} else {
+					$('.editing .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + newItemDueDate + '</span></p>')
+				}	
 			}
 		
-			$('.editing .item__description .item__content').text(newItemDescription);
-
+			if (newItemDescription == ''){
+				$('.editing .item__description').remove();
+			} else{
+				if ($('.editing .item__description').length){
+					$('.editing .item__description .item__content').text(newItemDescription);
+				} else {
+					$('.editing .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + newItemDescription + '</span></p>');
+				}
+			}
+			
 			$('.editing .item__name--edit').remove();
 			$('.editing .item__dueDate--edit').remove();
 			$('.editing .item__description--edit').remove();
@@ -204,21 +213,18 @@ function editItemState(item){
 
 	var itemNameVal = itemName.text();
 
-	var itemDueDateVal = itemDueDate.text().split(':')[1]; 
-	itemDueDateVal = convertFromStringToDate(itemDueDateVal); 
-
-	console.log(itemDueDateVal);
-
-	var itemDescriptionVal = itemDescription.text().split(':').slice(1);
-
 	itemPriorityVal = getPriority(itemPriority).toLowerCase(); 
 
 	$('<p class="item__name--edit" contenteditable="true">' + itemName + '</p>').insertAfter(itemName); 
 	$('.item__name--edit').text(itemNameVal);
 	placeCaretAtEnd($('.item__name--edit').get(0));
 
-	$('<input class="form__textbox form__textbox--edit item__dueDate--edit" type="date">').insertAfter(itemDueDate); 
-	$('.item__dueDate--edit').val(itemDueDateVal); 
+	item.find('.item__details').append('<input class="form__textbox form__textbox--edit item__dueDate--edit" type="date">'); 
+	if (itemDueDate.length){
+		var itemDueDateVal = itemDueDate.text().split(':')[1]; 
+		itemDueDateVal = convertFromStringToDate(itemDueDateVal); 
+		$('.item__dueDate--edit').val(itemDueDateVal); 
+	}
 
 	$('<fieldset class="inputgroup item__priority--edit">' + 
 		'<input id="priority__high--edit" type="radio" name="priority--edit" value="High">' +
@@ -235,7 +241,8 @@ function editItemState(item){
 	if ($(itemDescription).length < 1){
 		item.find('.item__details').append('<textarea class="form__textbox form__textbox--edit item__description--edit" placeholder="Description"></textarea>');
 	} else {
-		$('<textarea class="form__textbox form__textbox--edit item__description--edit"></textarea>').insertAfter(itemDescription); 
+		var itemDescriptionVal = itemDescription.text().split(':')[1].trim();
+		item.find('.item__details').append('<textarea class="form__textbox form__textbox--edit item__description--edit"></textarea>'); 
 		$('.item__description--edit').val(itemDescriptionVal);
 	}
 
@@ -325,11 +332,12 @@ function attachFilterListeners(){
 
 // Converts from YYYY-MM-DD to 
 function convertFromDateToString(todoDueDate){
+	console.log(todoDueDate)
 	var year = parseInt(todoDueDate.slice(0, 4)); 
 	var month = parseInt(todoDueDate.slice(5, 7));
 	var day = parseInt(todoDueDate.slice(8));
 
-	if (year !== year && month !== month && day !== day){
+	if (year !== year || month !== month || day !== day){
 		return null; 
 	}
 
@@ -376,7 +384,7 @@ function attachItemListeners(){
 		item.find('.item__description').hide();
 
 		// If an item is already being edited 
-		if ($('.editing').length > 0){
+		if ($('.editing').length){
 			var prevItem = $('.editing'); 
 			nonEditItemState();
 			// Check if clicked on a different item 
