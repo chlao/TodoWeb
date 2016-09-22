@@ -175,22 +175,10 @@ func UpdateItem(db *sql.DB) http.Handler{
 			buffer.WriteString(" = ")
 			buffer.WriteString("'" + strings.Join(val, "") + "'")
 			buffer.WriteString(", ")
-			fmt.Println(key)
-			fmt.Println(val)
 		}
-
-		//fmt.Println(buffer.Len())
 
 		buffer.Truncate(buffer.Len() - 2)
 		
-		//fmt.Println(buffer)
-		/*
-		todoName := r.FormValue("name")
-		todoDueDate := r.FormValue("dueDate")
-		todoPriority := r.FormValue("priority")
-		todoDescription := r.FormValue("description")
-		todoCompleted := r.FormValue("completed")
-		*/
 		stmt, err := db.Prepare("UPDATE todoitems SET " + buffer.String() + " WHERE id=?")
 		checkErr(err)
 

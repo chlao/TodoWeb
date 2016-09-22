@@ -1,3 +1,8 @@
+var todoweb = {
+	numCompletedItems: 0, 
+	numItems: 0
+};
+
 // Returns today's date 
 Date.prototype.toDateInputValue = (function() {
     var local = new Date(this);
@@ -23,22 +28,80 @@ function placeCaretAtEnd(el) {
     }
 }
 
+// Converts from YYYY-MM-DD to 
+function convertFromDateToString(todoDueDate){
+	if (todoDueDate == ''){
+		return null; 
+	}
+
+	var year = parseInt(todoDueDate.slice(0, 4)); 
+	var month = parseInt(todoDueDate.slice(5, 7));
+	var day = parseInt(todoDueDate.slice(8));
+
+	if (year !== year || month !== month || day !== day){
+		return null; 
+	}
+
+	return month + '/' + day +'/' + year;
+}
+
+// Converts from MM/DD/YYYY to YYYY-MM-DD
+function convertFromStringToDate(itemDueDate){
+	itemDueDateVal = itemDueDate.trim().split('/');
+
+	if (itemDueDateVal[0].length < 2){
+			itemDueDateVal[0] = '0' + itemDueDateVal[0]; 
+	}	
+
+	if (itemDueDateVal[1].length < 2){
+		itemDueDateVal[1] = '0' + itemDueDateVal[1]; 	
+	}
+
+	return itemDueDateVal[2] + '-' + itemDueDateVal[0] + '-' + itemDueDateVal[1];
+}
+
+function getPriority(itemPriority){
+	var itemPriorityVal = itemPriority.attr('class').split(' '); 
+	for (var i = itemPriorityVal.length -1; i >= 0; i--){
+		if (itemPriorityVal[i].indexOf('priority') > -1){
+			itemPriorityVal = itemPriorityVal[i]; 
+			break;
+		}
+	}
+
+	return itemPriorityVal.split('--')[1]; 
+}
+
+function updateItemsLeft(){ 
+	$('.itemsLeft').text((todoweb.numItems - todoweb.numCompletedItems) + ' left'); 
+}
+
+$(document).ready(function(){
+	resetFormValues();
+
+	attachFormListeners();
+	attachFilterListeners();
+	attachItemListeners();
+
+	readItems();
+});
+
 function readItems(){
 	$.ajax({
 		type: 'GET', 
 		url: '/todoitems',
 		datatype: 'json',
 		error: function(err){
-			console.log(err); 
+			handleError(err); 
 		}, 
-		success: function(data){
-			console.log(data);
+		success: function(data){ 
+			var numItems = data.length; 
 
-			if (data.length > 0){
+			if (numItems){
 				$('.todo__info').show();
 			}
 			// Add database items to list  
-			for (var i = 0; i < data.length; i++){
+			for (var i = 0; i < numItems; i++){
 				$('.todo__list').append('<li class="todo__item" id="item_' + data[i].id + '">' + 
 											'<i class="fa fa-circle ' + 'priority--' + data[i].priority + '" aria-hidden="true"></i>' + 
 											'<div class="todo__options">' + 
@@ -52,7 +115,7 @@ function readItems(){
 
 				if (data[i].dueDate !== ''){
 					$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + data[i].dueDate + '</span></p>'); 
-				}
+				} 
 
 				if (data[i].description !== ''){
 					$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + data[i].description + '</span></p>'); 
@@ -62,8 +125,11 @@ function readItems(){
 
 				if (data[i].completed == 1){
 					$('.todo__list .todo__item:last-child').addClass('completed'); 
+					todoweb.numCompletedItems++; 
 				}
 			}
+			todoweb.numItems = numItems; 
+			updateItemsLeft();
 		}
 	}); 
 }
@@ -73,30 +139,6 @@ function addItem(){
 	var todoPriority = $('input[name=priority]:checked').val();
 	var todoDueDate = $('#todo__dueDate').val();
 	var todoDescription = $('#todo__description').val();
-
-	todoDueDate = convertFromDateToString(todoDueDate); 
-
-	$('.todo__list').append('<li class="todo__item">' + 
-								'<i class="fa fa-circle ' + 'priority--' + todoPriority + '" aria-hidden="true"></i>' + 
-								'<div class="todo__options">' + 
-									'<i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
-									'<i class="fa fa-pencil todo__edit" aria-hidden="true"></i>' + 
-									'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i>' + 
-								'</div>' + 
-								'<p class="item__name">' + todoName + '</p>' +
-								'<div class="item__details">' + 
-									'</div></li>');
-
-
-	if (todoDueDate != null){
-		$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + todoDueDate + '</span></p>'); 
-	} 
-
-	if (todoDescription.trim() !== ''){
-		$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + todoDescription + '</span></p>'); 
-		$('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>').insertAfter('.todo__item:last-child .item__name'); 
-		$('.todo__item:last-child .item__description').hide();
-	} 
 
 	$.ajax({
 		type: 'POST', 
@@ -108,6 +150,33 @@ function addItem(){
 				completed: 0 }, 
 		error: handleError,
 		success: function(data){
+			todoDueDate = convertFromDateToString(todoDueDate); 
+
+			$('.todo__list').append('<li class="todo__item">' + 
+										'<i class="fa fa-circle ' + 'priority--' + todoPriority + '" aria-hidden="true"></i>' + 
+										'<div class="todo__options">' + 
+											'<i class="fa fa-lg fa-check todo__complete" aria-hidden="true"></i>' + 
+											'<i class="fa fa-pencil todo__edit" aria-hidden="true"></i>' + 
+											'<i class="fa fa-lg fa-times-circle todo__delete" aria-hidden="true"></i>' + 
+										'</div>' + 
+										'<p class="item__name">' + todoName + '</p>' +
+										'<div class="item__details">' + 
+											'</div></li>');
+
+
+			if (todoDueDate != null){
+				$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + todoDueDate + '</span></p>'); 
+			} 
+
+			if (todoDescription.trim() !== ''){
+				$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + todoDescription + '</span></p>'); 
+				$('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>').insertAfter('.todo__item:last-child .item__name'); 
+				$('.todo__item:last-child .item__description').hide();
+			} 
+
+			todoweb.numItems++; 
+			updateItemsLeft();
+
 			$('.todo__list .todo__item:last-child').attr('id', "item_" + data.id); 
 		}
 	}); 
@@ -115,6 +184,7 @@ function addItem(){
 
 function deleteItem(item){
 	var item_id = item.attr('id').split('_')[1]; 
+	var completed = item.hasClass('completed') ? 1 : 0; 
 
 	$.ajax({
 		type: 'DELETE', 
@@ -124,6 +194,16 @@ function deleteItem(item){
 		},
 		success: function(){
 			item.remove();
+
+			if ($('.todo__list').length === 0){
+				$('.todo__info').hide();
+			}
+
+			todoweb.numItems--; 
+			if (completed){
+				todoweb.numCompletedItems--;
+			}
+			updateItemsLeft();
 		}
 	}); 
 }
@@ -136,6 +216,10 @@ function updateItem(item){
 	var newItemDescription = $('.item__description--edit').val();
 	var newItemPriority = $('input[name=priority--edit]:checked').val();
 
+	if (newItemName.trim() == ''){
+		$('.error__message').text("Please provide a valid entry").show();
+	}
+
 	$.ajax({
 		type: 'PUT', 
 		url: '/todoitems/' + item_id,
@@ -144,7 +228,7 @@ function updateItem(item){
 				dueDate: newItemDueDate,
 				description: newItemDescription }, 
 		error: function(err){
-			console.log(err);
+			handleError(err); 
 		},
 		success: function(){	
 			$('.editing .item__name').text(newItemName); 
@@ -196,11 +280,16 @@ function updateItemCompleted(item){
 		url: '/todoitems/' + item_id,
 		data: { completed: completed}, 
 		error: function(err){
-			console.log(err);
+			handleError(err); 
 		},
 		success: function(){
 			item.toggleClass('completed');
-			console.log('completed');
+			if (item.hasClass('completed')){
+				todoweb.numCompletedItems++; 
+			} else {
+				todoweb.numCompletedItems--; 
+			}
+			updateItemsLeft();
 		}
 	}); 
 }
@@ -212,8 +301,9 @@ function editItemState(item){
 	var itemPriority = item.find('.fa-circle[class*="priority"]'); 
 
 	var itemNameVal = itemName.text();
-
-	itemPriorityVal = getPriority(itemPriority).toLowerCase(); 
+	var itemPriorityVal = getPriority(itemPriority).toLowerCase(); 
+	var itemDueDateVal; 
+	var itemDescriptionVal; 
 
 	$('<p class="item__name--edit" contenteditable="true">' + itemName + '</p>').insertAfter(itemName); 
 	$('.item__name--edit').text(itemNameVal);
@@ -221,7 +311,7 @@ function editItemState(item){
 
 	item.find('.item__details').append('<input class="form__textbox form__textbox--edit item__dueDate--edit" type="date">'); 
 	if (itemDueDate.length){
-		var itemDueDateVal = itemDueDate.text().split(':')[1]; 
+		itemDueDateVal = itemDueDate.text().split(':')[1]; 
 		itemDueDateVal = convertFromStringToDate(itemDueDateVal); 
 		$('.item__dueDate--edit').val(itemDueDateVal); 
 	}
@@ -241,7 +331,7 @@ function editItemState(item){
 	if ($(itemDescription).length < 1){
 		item.find('.item__details').append('<textarea class="form__textbox form__textbox--edit item__description--edit" placeholder="Description"></textarea>');
 	} else {
-		var itemDescriptionVal = itemDescription.text().split(':')[1].trim();
+		itemDescriptionVal = itemDescription.text().split(':')[1].trim();
 		item.find('.item__details').append('<textarea class="form__textbox form__textbox--edit item__description--edit"></textarea>'); 
 		$('.item__description--edit').val(itemDescriptionVal);
 	}
@@ -267,23 +357,9 @@ function nonEditItemState(){
 	$('.editing').removeClass('editing'); 
 }
 
-function getPriority(itemPriority){
-	var itemPriorityVal = itemPriority.attr('class').split(' '); 
-	for (var i = itemPriorityVal.length -1; i >= 0; i--){
-		if (itemPriorityVal[i].indexOf('priority') > -1){
-			itemPriorityVal = itemPriorityVal[i]; 
-			break;
-		}
-	}
-
-	return itemPriorityVal.split('--')[1]; 
-}
-
-// TEST 
-function handleError(jqXHR, textStatus, errorThrown){
-	$('error__message').text(textStatus + ' - ' + errorThrown).show();
-	// Remove the item added on the client-side 
-	$('.todo__list .todo__item:last-child').remove();
+function handleError(err){
+	$('.error__message').text('An error has occured.').show();
+	console.log(err); 
 }
 
 function resetFormValues(){
@@ -292,16 +368,6 @@ function resetFormValues(){
 	$('#todo__description').val('');
 	$('#todo__dueDate').val(new Date().toDateInputValue());
 }
-
-$(document).ready(function(){
-	resetFormValues();
-
-	attachFormListeners();
-	attachFilterListeners();
-	attachItemListeners();
-
-	readItems();
-});
 
 function attachFilterListeners(){
 	$('.filter__completed').click(function(){
@@ -328,36 +394,6 @@ function attachFilterListeners(){
 		$('.filter__button').removeClass('selected__filter'); 
 		$(this).addClass('selected__filter');
 	});
-}
-
-// Converts from YYYY-MM-DD to 
-function convertFromDateToString(todoDueDate){
-	console.log(todoDueDate)
-	var year = parseInt(todoDueDate.slice(0, 4)); 
-	var month = parseInt(todoDueDate.slice(5, 7));
-	var day = parseInt(todoDueDate.slice(8));
-
-	if (year !== year || month !== month || day !== day){
-		return null; 
-	}
-
-	return month + '/' + day +'/' + year;
-}
-
-// Converts from MM/DD/YYYY to YYYY-MM-DD
-function convertFromStringToDate(itemDueDate){
-	itemDueDateVal = itemDueDate.trim().split('/');
-	console.log(itemDueDateVal);
-
-	if (itemDueDateVal[0].length < 2){
-			itemDueDateVal[0] = '0' + itemDueDateVal[0]; 
-	}	
-
-	if (itemDueDateVal[1].length < 2){
-		itemDueDateVal[1] = '0' + itemDueDateVal[1]; 	
-	}
-
-	return itemDueDateVal[2] + '-' + itemDueDateVal[0] + '-' + itemDueDateVal[1];
 }
 
 function attachItemListeners(){
@@ -404,7 +440,6 @@ function attachItemListeners(){
 		if (!$(this).hasClass('editing')){
 			$(this).find('.item__description').slideToggle();
 		}
-			
 	});
 }
 

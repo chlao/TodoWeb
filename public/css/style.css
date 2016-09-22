@@ -4,7 +4,7 @@
 	font-size: 28px;
 	font-family: 'Open Sans', sans-serif;
 	background-color: rgb(104, 195, 163);
-	padding: 20px 100px;
+	padding: 30px 100px;
 	-webkit-box-shadow: 35px 35px 0 5px rgb(77, 175, 124);  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
   	-moz-box-shadow:    35px 35px 0 5px rgb(77, 175, 124);  /* Firefox 3.5 - 3.6 */
   	box-shadow:         35px 35px 0 5px rgb(77, 175, 124);  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
@@ -14,14 +14,8 @@
 	text-align: center;
 }
 
-.todo__form{
-	margin: 0 auto;
-	background-color: #CCC;
-	padding: 15px 0;
-}
-
-.todo__form *{
-	font: inherit;
+.addarrow{
+    float: right;
 }
 
 .form__title{
@@ -31,13 +25,14 @@
 	margin: 0;
 }
 
-.addarrow{
-    float: right;
+.todo__form{
+	margin: 0 auto;
+	margin-bottom: 20px;
+	background-color: #CCC;
+	padding: 15px 0;
 }
 
-.fa{
-	font-family: FontAwesome;
-}
+
 
 .form__textbox{
 	padding: 5px 20px;
@@ -98,7 +93,11 @@ label[for^="priority"]{
 	position: relative;
 }
 
-.completed{
+.todo__item:last-child{
+	margin-bottom: 25px;
+}
+
+.completed .item__name{
 	text-decoration: line-through;
 }
 
@@ -151,6 +150,10 @@ label[for^="priority"]{
 	display: none;
 	text-align: center;
 	color: red;
+}
+
+.fa{
+	font-family: FontAwesome;
 }
 
 button:focus, input:focus, select:focus, textarea:focus {outline:0;}
@@ -225,4 +228,16 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 
 .editing .item__dueDate, .editing .item__description, .editing .item__name{
 	display: none;
+}
+
+.editing .todo__edit{
+	color: yellow;
+}
+
+.filter{
+	float: right;
+}
+
+.itemsLeft{
+	display: inline; 
 }
