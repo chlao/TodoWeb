@@ -10,6 +10,8 @@
   	box-shadow:         35px 35px 0 5px rgb(77, 175, 124);  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
 }
 
+
+/***************** To Do Form *****************/
 .todo__title{
 	text-align: center;
 }
@@ -32,7 +34,15 @@
 	padding: 15px 0;
 }
 
+.todo__form *{
+	font: inherit;
+}
 
+.inputgroup{
+	margin-bottom: 15px;
+	border: 0;
+	padding: 0;
+}
 
 .form__textbox{
 	padding: 5px 20px;
@@ -49,16 +59,16 @@
 	margin-bottom: 10px;
 }
 
-#todo__description{
-	width: 50%;
-}
-
 label[for^="priority"]{
 	font-size: 0.8em;
 }
 
 .todo__priority input:not(#priority__high){
 	margin-left: 235px;
+}
+
+#todo__description{
+	width: 50%;
 }
 
 .todo__submit{
@@ -73,11 +83,11 @@ label[for^="priority"]{
 	color: white;
 }
 
-.todo__submit--edit{
-	margin: 0;
-	text-decoration: none;
-}
+button:focus, input:focus, select:focus, textarea:focus {outline:0;}
 
+label:not([for^="priority"]), legend{ text-align: right; display: inline-block; width: 200px; float:left; margin-right: 25px;}
+
+/***************** To Do List/Items *****************/
 .todo__list{
 	list-style: none;
 	margin: 0 auto;
@@ -127,67 +137,6 @@ label[for^="priority"]{
 	margin: 0 auto;
 }
 
-.filter__button{
-	border: none;
-	background-color: rgb(1, 152, 117);
-	color: white;
-	font-weight: bold;
-	font-size: 20px;
-	font-family: 'Open Sans', sans-serif;
-	border-radius: 10px;
-	padding: 10px;
-}
-
-.filter__button:hover{
-	background-color: rgba(1, 152, 117, 0.5);
-}
-
-.selected__filter{
-	background-color: rgb(249, 191, 59); 
-}
-
-.error__message{
-	display: none;
-	text-align: center;
-	color: red;
-}
-
-.fa{
-	font-family: FontAwesome;
-}
-
-button:focus, input:focus, select:focus, textarea:focus {outline:0;}
-
-label:not([for^="priority"]), legend{ text-align: right; display: inline-block; width: 200px; float:left; margin-right: 25px;}
-
-/*
-[type="radio"] {
-  border: 0; 
-  clip: rect(0 0 0 0); 
-  height: 1px; margin: -1px; 
-  overflow: hidden; 
-  padding: 0; 
-  position: absolute; 
-  width: 1px;
-}
-
-.priority__radio{
-	margin-right: 10px;
-}
-*/
-
-.expandItem{
-	position: absolute;
-	bottom: 20px; 
-	right: 20px; 
-}
-
-.inputgroup{
-	margin-bottom: 15px;
-	border: 0;
-	padding: 0;
-}
-
 .priority--High{
 	color: red; 
 }
@@ -226,6 +175,12 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	display: inline-block;
 }
 
+.expandItem{
+	position: absolute;
+	bottom: 20px; 
+	right: 20px; 
+}
+
 .editing .item__dueDate, .editing .item__description, .editing .item__name{
 	display: none;
 }
@@ -234,10 +189,45 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	color: yellow;
 }
 
+.todo__submit--edit{
+	margin: 0;
+	text-decoration: none;
+}
+
+/***************** Filter Items *****************/
 .filter{
 	float: right;
 }
 
+.filter__button{
+	border: none;
+	background-color: rgb(1, 152, 117);
+	color: white;
+	font-weight: bold;
+	font-size: 20px;
+	font-family: 'Open Sans', sans-serif;
+	border-radius: 10px;
+	padding: 10px;
+}
+
+.filter__button:hover{
+	background-color: rgba(1, 152, 117, 0.5);
+}
+
+.selected__filter{
+	background-color: rgb(249, 191, 59); 
+}
+
 .itemsLeft{
 	display: inline; 
+}
+
+.error__message{
+	display: none;
+	text-align: center;
+	color: red;
+}
+
+.fa{
+	font-family: FontAwesome;
 }
