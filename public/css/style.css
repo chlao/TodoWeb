@@ -1,41 +1,36 @@
+body{
+	background-color: rgb(149, 165, 166); 
+}
+
 .todo__container{
 	margin: 50px auto;
 	width: 40%;
 	font-size: 28px;
 	font-family: 'Open Sans', sans-serif;
 	background-color: rgb(104, 195, 163);
-	padding: 30px 100px;
-	-webkit-box-shadow: 35px 35px 0 5px rgb(77, 175, 124);  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
-  	-moz-box-shadow:    35px 35px 0 5px rgb(77, 175, 124);  /* Firefox 3.5 - 3.6 */
-  	box-shadow:         35px 35px 0 5px rgb(77, 175, 124);  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+	padding: 10px 0 23px 0;
+	border-radius: 15px;
 }
 
 
 /***************** To Do Form *****************/
 .todo__title{
-	text-align: center;
+	color: white;
+	margin: 25px;
+	display: inline;
+	font-size: 52px;
 }
 
-.addarrow{
-    float: right;
-}
-
-.form__title{
-	background-color: gray;
-	padding: 15px;
-	font-size: inherit;
-	margin: 0;
+.addItem{
+	float: right;
+	margin: 10px 15px 0 0;
 }
 
 .todo__form{
-	margin: 0 auto;
-	margin-bottom: 20px;
-	background-color: #CCC;
+	margin: 10px 0 20px 0;
+	background-color: rgb(164, 219, 199);
 	padding: 15px 0;
-}
-
-.todo__form *{
-	font: inherit;
+	display: none;
 }
 
 .inputgroup{
@@ -47,7 +42,8 @@
 .form__textbox{
 	padding: 5px 20px;
 	border: none;
-	border-radius: 15px;
+	border-radius: 10px;
+	font: inherit;
 	font-size: 0.8em;
 }
 
@@ -74,13 +70,14 @@ label[for^="priority"]{
 .todo__submit{
 	outline: none;
 	border: none;
-	border-radius: 15px;
+	border-radius: 10px;
 	padding: 5px 20px;
 	width: 140px;
 	margin: 0 auto;
 	display: block;
 	background-color: rgb(77, 175, 124);
 	color: white;
+	font-size: 1.1em;
 }
 
 button:focus, input:focus, select:focus, textarea:focus {outline:0;}
@@ -90,21 +87,21 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 /***************** To Do List/Items *****************/
 .todo__list{
 	list-style: none;
-	margin: 0 auto;
+	margin: 15px auto;
 	padding-left: 0;
-}
+	overflow-y: scroll;
+	height: 90vh;
+}	
 
 .todo__item{
 	padding: 20px;
 	background-color: white;
-	margin-top: 15px;
-	margin-bottom: 5px;
 	text-align: left;
 	position: relative;
 }
 
-.todo__item:last-child{
-	margin-bottom: 25px;
+.todo__item:not(:last-child){
+	border-bottom: 3px dotted #CCC;
 }
 
 .completed .item__name{
@@ -166,6 +163,10 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	margin: 0;
 }
 
+.item__name--edit{
+	margin-bottom: 10px;
+}
+
 .item__details{
 	margin-left: 44px;
 }
@@ -197,6 +198,7 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 /***************** Filter Items *****************/
 .filter{
 	float: right;
+	margin: 0 15px 0 0;
 }
 
 .filter__button{
@@ -219,15 +221,60 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 }
 
 .itemsLeft{
-	display: inline; 
+	display: inline-block; 
+	margin: 0 0 0 15px;
 }
 
 .error__message{
 	display: none;
 	text-align: center;
 	color: red;
+	position: fixed;
+	left: 50%; 
+	background-color: white;
+	padding: 20px 0; 
+	border-radius: 10px;
+	-webkit-box-shadow: 5px 5px 0 5px rgb(77, 175, 124);  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+  	-moz-box-shadow:    5px 5px 0 5px rgb(77, 175, 124);  /* Firefox 3.5 - 3.6 */
+  	box-shadow:         5px 5px 0 5px rgb(77, 175, 124);  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+  	z-index: 5; 
 }
 
 .fa{
 	font-family: FontAwesome;
+}
+
+/**************** Media Styles *****************/
+@media (max-width: 1375px){
+	.todo__container{
+		width: 50%; 
+	}
+}
+
+@media(max-width: 1150px){
+	.todo__container{
+		width: 60%; 
+	}
+}
+
+@media(max-width: 950px){
+	.todo__container{
+		width: 70%; 
+	}
+}
+
+@media(max-width: 800px){
+	.todo__container{
+		width: 85%; 
+	}
+}
+
+@media(max-width: 700px){
+	.todo__container{
+		width: 95%; 
+	}
+}
+
+@media(max-width: 600px){
+
 }

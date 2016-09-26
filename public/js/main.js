@@ -217,7 +217,8 @@ function updateItem(item){
 	var newItemPriority = $('input[name=priority--edit]:checked').val();
 
 	if (newItemName.trim() == ''){
-		$('.error__message').text("Please provide a valid entry").show();
+		$('.error__message').text("Please provide a task name").show();
+		return;
 	}
 
 	$.ajax({
@@ -336,7 +337,7 @@ function editItemState(item){
 		$('.item__description--edit').val(itemDescriptionVal);
 	}
 
-	item.find('.item__details').append('<input class="todo__submit todo__submit--edit" type="submit">');
+	item.find('.item__details').append('<button class="todo__submit todo__submit--edit">Update</button>');
 	$('.todo__submit').on('click', function(){
 		updateItem(item); 
 	}); 
@@ -447,7 +448,11 @@ function attachFormListeners(){
 	$('.todo__form').submit(function(e){
 
 		if ($('#todo__name').val().trim() === ''){
-			$('.error__message').text("Please provide a valid entry").show();
+			$('.error__message').text("Please provide a task name").show();
+			var width = $('.todo__list').css('width');
+			$('.error__message').css('width', width);
+			width = parseInt(width.substring(0, width.length - 2));  
+			$('.error__message').css('margin-left', '-' + (width/2) + 'px');
 		} else{
 			addItem();
 			$('.todo__info').show();
@@ -462,7 +467,7 @@ function attachFormListeners(){
 		return false; 
 	});
 
-	$('.addarrow').click(function(){
+	$('.addItem').click(function(){
 		$('.todo__form').slideToggle();
 	});
 }

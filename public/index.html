@@ -13,11 +13,12 @@
 	</head>
 	<body>
 		<div class="todo__container"> 
+			<div class="error__message"></div> 
 			<h1 class="todo__title"> TO DO LIST </h1> 
-			<h2 class="form__title"> Add a Task <i class="fa fa-angle-down addarrow" aria-hidden="true" style="font-size: 36px;"></i></h2>
+			<i class="fa fa-2x fa-plus-circle addItem" aria-hidden="true"></i>
 			<form class="todo__form">
 				<fieldset class="inputgroup">
-					<label for="todo__name">Task</label>
+					<label for="todo__name" required>Task</label>
 					<input id="todo__name" class="form__textbox" name="todo__name" type="text" placeholder="What needs to be done?" autofocus>
 				</fieldset> 
 
@@ -44,7 +45,6 @@
 				</fieldset>
 				<input class="todo__submit" type="submit">
 			</form>
-			<p class="error__message"></p> 
 			<ul class="todo__list"></ul>
 			<div class="todo__info"> 
 				<p class="itemsLeft"></p> 
