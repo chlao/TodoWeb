@@ -4,7 +4,7 @@ import (
 	"os"
 	"net/http"
 	"log"
-	"fmt"
+	//"fmt"
 	//"io"
 	/*  _ It's for importing a package solely for its side-effects.
 		In the case of go-sqlite3, the underscore import is used for the side-effect of registering 
@@ -72,8 +72,6 @@ func AddItem(db *sql.DB) http.Handler{
 		todoPriority := r.PostFormValue("priority")
 		todoDescription := r.PostFormValue("description")
 		todoCompleted := r.PostFormValue("completed")
-
-		fmt.Println(r.Form)
 
 	 	// Insert 
 		stmt, err := db.Prepare("INSERT INTO todoitems (name, dueDate, priority, description, completed) VALUES(?, ?, ?, ?, ?)")
@@ -182,13 +180,8 @@ func UpdateItem(db *sql.DB) http.Handler{
 		stmt, err := db.Prepare("UPDATE todoitems SET " + buffer.String() + " WHERE id=?")
 		checkErr(err)
 
-		res, err := stmt.Exec(id)
+		_, err = stmt.Exec(id)
 		checkErr(err)
-
-		affected, err := res.RowsAffected()
-		checkErr(err)
-		fmt.Println(affected)
-		
 	})
 }
 

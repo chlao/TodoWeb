@@ -59,6 +59,14 @@ function convertFromStringToDate(itemDueDate){
 		itemDueDateVal[1] = '0' + itemDueDateVal[1]; 	
 	}
 
+	if (itemDueDateVal[2].length < 4){
+		var str = ''; 
+		for (var i = 0; i < (4 - itemDueDateVal[2].length); i++){
+			str += '0'; 
+		}
+		itemDueDateVal[2] = str + itemDueDateVal[2]; 
+	}
+
 	return itemDueDateVal[2] + '-' + itemDueDateVal[0] + '-' + itemDueDateVal[1];
 }
 
@@ -116,12 +124,12 @@ function readItems(){
 												'</div></li>');
 
 				if (data[i].dueDate !== ''){
-					$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + data[i].dueDate + '</span></p>'); 
+					$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due: </span><span class="item__content"> ' + data[i].dueDate + '</span></p>'); 
 				} 
 
 				if (data[i].description !== ''){
-					$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + data[i].description + '</span></p>'); 
-					$('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>').insertAfter('.todo__item:last-child .item__name'); 
+					$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description: </span><span class="item__content"> ' + data[i].description + '</span></p>'); 
+					$('.todo__item:last-child').append('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>');
 					$('.todo__item:last-child .item__description').hide();
 				}
 
@@ -165,12 +173,12 @@ function addItem(){
 											'</div></li>');
 
 			if (todoDueDate != null){
-				$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + todoDueDate + '</span></p>'); 
+				$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due: </span><span class="item__content"> ' + todoDueDate + '</span></p>'); 
 			} 
 
 			if (todoDescription.trim() !== ''){
-				$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + todoDescription + '</span></p>'); 
-				$('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>').insertAfter('.todo__item:last-child .item__name'); 
+				$('.todo__item:last-child .item__details').append('<p class="item__description"><span class="item__title">Description: </span><span class="item__content"> ' + todoDescription + '</span></p>'); 
+				$('.todo__item:last-child').append('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>');
 				$('.todo__item:last-child .item__description').hide();
 			} 
 
@@ -178,6 +186,8 @@ function addItem(){
 			updateItemsLeft();
 
 			$('.todo__list .todo__item:last-child').attr('id', "item_" + data.id); 
+			$("html, body").animate({ scrollTop: $(document).height() }, 250);
+			$('.todo__list').prop('scrollTop', $('.todo__list').prop('scrollHeight')); 
 		}
 	}); 
 }
@@ -193,7 +203,7 @@ function deleteItem(item){
 			console.log(err);
 		},
 		success: function(){
-			item.remove();
+			item.slideUp('normal', function(){$(this).remove();});
 
 			if ($('.todo__list').length === 0){
 				$('.todo__info').hide();
@@ -312,8 +322,9 @@ function editItemState(item){
 
 	item.find('.item__details').append('<input class="form__textbox form__textbox--edit item__dueDate--edit" type="date">'); 
 	if (itemDueDate.length){
-		itemDueDateVal = itemDueDate.text().split(':')[1]; 
+		itemDueDateVal = itemDueDate.find('.item__content').text(); 
 		itemDueDateVal = convertFromStringToDate(itemDueDateVal); 
+		console.log(itemDueDateVal);
 		$('.item__dueDate--edit').val(itemDueDateVal); 
 	}
 
@@ -332,7 +343,7 @@ function editItemState(item){
 	if ($(itemDescription).length < 1){
 		item.find('.item__details').append('<textarea class="form__textbox form__textbox--edit item__description--edit" placeholder="Description"></textarea>');
 	} else {
-		itemDescriptionVal = itemDescription.text().split(':')[1].trim();
+		itemDescriptionVal = itemDescription.find('.item__content').text().trim();
 		item.find('.item__details').append('<textarea class="form__textbox form__textbox--edit item__description--edit"></textarea>'); 
 		$('.item__description--edit').val(itemDescriptionVal);
 	}
@@ -343,19 +354,28 @@ function editItemState(item){
 	}); 
 
 	item.addClass('editing'); 
+
+	item.find('.item__dueDate').slideUp();
+	$(".editing [class$='--edit']:not('.item__name--edit')").slideToggle('normal', function(){
+		if ($(this).is(':visible')){
+        	$(this).css('display','block');
+        }
+	});
 }
 
 function nonEditItemState(){
-	$('.editing .item__content').show();
+	$(".editing [class$='--edit']:not('.item__name--edit')").slideUp('normal', function(){
+		//$('.editing .item__content').show();
 
-	$('.editing .item__name--edit').remove();
-	$('.editing .item__dueDate--edit').remove();
-	$('.editing .item__description--edit').remove();
+		$('.editing .item__name--edit').remove();
+		$('.editing .item__dueDate--edit').remove();
+		$('.editing .item__description--edit').remove();
 
-	$('.item__priority--edit').remove();
-	$('.todo__submit--edit').remove();
+		$('.item__priority--edit').remove();
+		$('.todo__submit--edit').remove();
 
-	$('.editing').removeClass('editing'); 
+		$('.editing').removeClass('editing'); 
+	});
 }
 
 function handleError(err){
@@ -445,8 +465,7 @@ function attachItemListeners(){
 }
 
 function attachFormListeners(){
-	$('.todo__form').submit(function(e){
-
+	$('.todo__form').submit(function(){
 		if ($('#todo__name').val().trim() === ''){
 			$('.error__message').text("Please provide a task name").show();
 			var width = $('.todo__list').css('width');
