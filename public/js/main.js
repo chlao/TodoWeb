@@ -34,9 +34,11 @@ function convertFromDateToString(todoDueDate){
 		return null; 
 	}
 
-	var year = parseInt(todoDueDate.slice(0, 4)); 
-	var month = parseInt(todoDueDate.slice(5, 7));
-	var day = parseInt(todoDueDate.slice(8));
+	todoDueDateObject = new Date(todoDueDate);
+
+	var year = todoDueDateObject.getFullYear();
+	var month = todoDueDateObject.getMonth() + 1;
+	var day = todoDueDateObject.getDate() + 1;
 
 	if (year !== year || month !== month || day !== day){
 		return null; 
@@ -138,6 +140,7 @@ function addItem(){
 	var todoName = $('#todo__name').val();
 	var todoPriority = $('input[name=priority]:checked').val();
 	var todoDueDate = $('#todo__dueDate').val();
+	todoDueDate = convertFromDateToString(todoDueDate); 
 	var todoDescription = $('#todo__description').val();
 
 	$.ajax({
@@ -150,8 +153,6 @@ function addItem(){
 				completed: 0 }, 
 		error: handleError,
 		success: function(data){
-			todoDueDate = convertFromDateToString(todoDueDate); 
-
 			$('.todo__list').append('<li class="todo__item">' + 
 										'<i class="fa fa-circle ' + 'priority--' + todoPriority + '" aria-hidden="true"></i>' + 
 										'<div class="todo__options">' + 
@@ -162,7 +163,6 @@ function addItem(){
 										'<p class="item__name">' + todoName + '</p>' +
 										'<div class="item__details">' + 
 											'</div></li>');
-
 
 			if (todoDueDate != null){
 				$('.todo__item:last-child .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + todoDueDate + '</span></p>'); 
