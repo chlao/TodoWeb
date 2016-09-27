@@ -250,7 +250,7 @@ function updateItem(item){
 				if ($('.editing .item__dueDate').length){
 					$('.editing .item__dueDate .item__content').text(newItemDueDate); 
 				} else {
-					$('.editing .item__details').append('<p class="item__dueDate"><span class="item__title">Due:</span><span class="item__content"> ' + newItemDueDate + '</span></p>')
+					$('.editing .item__details').append('<p class="item__dueDate"><span class="item__title">Due: </span><span class="item__content"> ' + newItemDueDate + '</span></p>')
 				}	
 			}
 		
@@ -260,8 +260,10 @@ function updateItem(item){
 				if ($('.editing .item__description').length){
 					$('.editing .item__description .item__content').text(newItemDescription);
 				} else {
-					$('.editing .item__details').append('<p class="item__description"><span class="item__title">Description:</span><span class="item__content"> ' + newItemDescription + '</span></p>');
+					$('.editing .item__details').append('<p class="item__description"><span class="item__title">Description: </span><span class="item__content"> ' + newItemDescription + '</span></p>');
 				}
+
+				$('.editing').append('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>');
 			}
 			
 			$('.editing .item__name--edit').remove();
@@ -354,6 +356,7 @@ function editItemState(item){
 	}); 
 
 	item.addClass('editing'); 
+	item.find('.expandItem').remove(); 
 
 	item.find('.item__dueDate').slideUp();
 	$(".editing [class$='--edit']:not('.item__name--edit')").slideToggle('normal', function(){
@@ -373,6 +376,11 @@ function nonEditItemState(){
 
 		$('.item__priority--edit').remove();
 		$('.todo__submit--edit').remove();
+
+		if ($('.editing .item__description').length > 0){
+			$('.editing').append('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>');
+		}
+	
 
 		$('.editing').removeClass('editing'); 
 	});
@@ -454,12 +462,20 @@ function attachItemListeners(){
 	});
 
 	$('.todo__list').on('click', '.todo__item', function(e){
-		if ($(event.target).hasClass('todo__complete') || $(event.target).hasClass('todo__delete') || $(event.target).hasClass('todo__edit')){
+		if ($(e.target).hasClass('todo__complete') || $(e.target).hasClass('todo__delete') || $(e.target).hasClass('todo__edit')){
 			return;
 		}
 		
 		if (!$(this).hasClass('editing')){
 			$(this).find('.item__description').slideToggle();
+		}
+
+		$(this).toggleClass('expanded'); 
+
+		if($(this).hasClass('expanded')){
+			$(this).find('.expandItem').replaceWith('<i class="fa fa-lg fa-angle-up expandItem" aria-hidden="true"></i>'); 
+		} else {
+			$(this).find('.expandItem').replaceWith('<i class="fa fa-lg fa-angle-down expandItem" aria-hidden="true"></i>'); 
 		}
 	});
 }

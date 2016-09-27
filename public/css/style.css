@@ -18,12 +18,13 @@ body{
 	color: white;
 	margin: 25px;
 	display: inline;
-	font-size: 52px;
+	font-size: 1.85em;
 }
 
 .addItem{
 	float: right;
 	margin: 10px 15px 0 0;
+	font-size: 56px;
 }
 
 .addItem:hover{
@@ -302,12 +303,33 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	label:not([for^="priority"]), legend{ 
 		text-align: left;
 		float: none;
+		display: block;	
 	}
 	.inputgroup{
 		margin-left: 25px;
 	}
 
 	.todo__priority input:not(#priority__high){
-		margin-left: 0;
+		margin-left: 5px;
 	}
+}
+
+@media(max-width: 400px){
+	.todo__container{
+		width: 100%;
+	}
+	.todo__title, .addItem{
+		font-size: 1.4em;
+	}
+	.filter{
+		float: none;
+		display: block;
+		margin: 0 auto 10px auto; 
+		width: 243px;
+	}
+	.itemsLeft{
+		float: none;
+		text-align: center;
+		display: block;	
+	}	
 }
