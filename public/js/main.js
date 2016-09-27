@@ -326,7 +326,6 @@ function editItemState(item){
 	if (itemDueDate.length){
 		itemDueDateVal = itemDueDate.find('.item__content').text(); 
 		itemDueDateVal = convertFromStringToDate(itemDueDateVal); 
-		console.log(itemDueDateVal);
 		$('.item__dueDate--edit').val(itemDueDateVal); 
 	}
 

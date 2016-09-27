@@ -3,7 +3,7 @@ body{
 }
 
 .todo__container{
-	margin: 15px auto;
+	margin: 15px auto;	
 	width: 40%;
 	font-size: 28px;
 	font-family: 'Open Sans', sans-serif;
@@ -99,6 +99,7 @@ label[for^="priority"]{
 	background-color: rgb(77, 175, 124);
 	color: white;
 	font: inherit;
+	font-size: 0.8em;
 }
 
 button:focus, input:focus, select:focus, textarea:focus {outline:0;}
@@ -111,7 +112,7 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	margin: 15px auto;
 	padding-left: 0;
 	overflow-y: scroll;
-	height: 78vh;
+	max-height: 78vh;
 }	
 
 .todo__item{
@@ -305,7 +306,7 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 		float: none;
 		display: block;	
 	}
-	.inputgroup{
+	.todo__form .inputgroup{
 		margin-left: 25px;
 	}
 
@@ -321,6 +322,9 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 	.todo__title, .addItem{
 		font-size: 1.4em;
 	}
+	.todo__submit:not(.todo__submit--edit){
+		margin: 0 0 0 25px;
+	}
 	.filter{
 		float: none;
 		display: block;
@@ -332,4 +336,17 @@ label:not([for^="priority"]), legend{ text-align: right; display: inline-block; 
 		text-align: center;
 		display: block;	
 	}	
+	.form__textbox{
+		width: 80%;	
+	}
+	.todo__options .fa{
+		display: block;
+		margin: 0 0 10px 0;
+	}
+	.todo__options .fa:not(:first-child){
+		margin:;
+	}
+	.expandItem{
+		clear: both;
+	}
 }
